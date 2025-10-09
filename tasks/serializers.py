@@ -126,11 +126,12 @@ class TaskDetailSerializer(serializers.ModelSerializer):
     Детальное представление задачи с вложенными подзадачами.
     """
     status = StatusSerializer(read_only=True)
-    subtasks = SubTaskSerializer(many=True, read_only=True, source="subtasks")
+    subtasks = SubTaskSerializer(many=True, read_only=True)  # ✅ убрали source="subtasks"
 
     class Meta:
         model = Task
         fields = ("id", "title", "description", "status", "deadline", "subtasks")
+
 
 
 # ---------- Деталка SubTask для ответов API ----------

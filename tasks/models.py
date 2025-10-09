@@ -15,7 +15,7 @@ class Task(models.Model):
     description = models.TextField(blank=True)
     status = models.ForeignKey(Status, on_delete=models.CASCADE)
     deadline = models.DateTimeField()
-
+    created_at = models.DateTimeField(default=timezone.now)
     def __str__(self):
         return self.title
 
@@ -46,7 +46,7 @@ class SubTask(models.Model):
     status = models.ForeignKey(Status, on_delete=models.CASCADE)
     deadline = models.DateTimeField()
     task = models.ForeignKey(Task, related_name='subtasks', on_delete=models.CASCADE)
-    created_at = models.DateTimeField(auto_now_add=True)  # Добавим поле created_at
+    created_at = models.DateTimeField(default=timezone.now)  # Добавим поле created_at
 
     def __str__(self):
         return self.title
