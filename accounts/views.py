@@ -128,15 +128,23 @@ class LogoutView(generics.GenericAPIView):
     - Чистит cookies
     """
     permission_classes = [AllowAny]
+    serializer_class = LoginSerializer
 
     def post(self, request, *args, **kwargs):
-        cookie_refresh = request.COOKIES.get(REFRESH_COOKIE)
-        if cookie_refresh:
-            try:
-                token = RefreshToken(cookie_refresh)
-                token.blacklist()  # ⛔ чёрный список
-            except Exception:
-                pass  # если токен уже невалиден — просто чистим куки
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data['user']
 
-        resp = Response({"detail": "Logged out"}, status=status.HTTP_200_OK)
-        return clear_token_cookies(resp)
+        refresh = RefreshToken.for_user(user)
+        access = str(refresh.access_token)
+
+        response = Response({
+            "user": {
+                "id": user.id,
+                "username": user.username,
+                "email": user.email,
+            }
+        }, status=status.HTTP_200_OK)
+
+        return set_token_cookies(response, access, str(refresh))
+
